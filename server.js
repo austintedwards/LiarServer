@@ -77,7 +77,7 @@ app.get('/api/game/:phrase', (req, res)=> {
     if(err) {
       return next (err);
     }
-    if(!game) return res.json();
+    if(!game) return res.json({passphrase:"not working"});
     return res.json(game);
   })
 });
