@@ -75,7 +75,7 @@ router.put('/api/game/:phrase', (req, res)=> {
   })
 });
 
-reouter.get('/api/game/:phrase', (req, res)=> {
+router.get('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) {
       return next (err);
