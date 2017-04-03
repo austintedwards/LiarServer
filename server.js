@@ -61,12 +61,9 @@ var Game = mongoose.model('Game', {
 
 
 app.put('/api/game/:phrase', (req, res)=> {
-  console.log(req.params);
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.send;
-    console.log(req.body.player)
-    console.log("length", game.players.length)
     if(game.players.length<4){
       game.players.push({name:req.body.player})
     }
