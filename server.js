@@ -1,6 +1,7 @@
 // Set up
 var express  = require('express');
-var app      = express();                               // create our app w/ express
+var app      = express();
+var router = require('express').Router();                              // create our app w/ express
 var mongoose = require('mongoose');                     // mongoose for mongodb
 var morgan = require('morgan');             // log requests to the console (express4)
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
@@ -33,12 +34,12 @@ var Game = mongoose.model('Game', {
 
 // Routes
 
-    app.get('/api/game', (req, res)=> {
+    router.get('/api/game', (req, res)=> {
         console.log("fetching games");
     });
 
     // create review and send back all reviews after creation
-    app.post('/api/game', (req, res) =>{
+    router.post('/api/game', (req, res) =>{
       Game.create({
           players: [{name:req.body.player}],
           passphrase : req.body.phrase,
@@ -58,7 +59,7 @@ var Game = mongoose.model('Game', {
 });
 
 
-app.put('/api/game/:phrase', (req, res)=> {
+router.put('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.send;
@@ -72,7 +73,7 @@ app.put('/api/game/:phrase', (req, res)=> {
   })
 });
 
-app.get('/api/game/:phrase', (req, res)=> {
+reouter.get('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) {
       return next (err);
