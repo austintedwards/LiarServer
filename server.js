@@ -72,10 +72,19 @@ app.put('/api/game/:phrase', (req, res)=> {
       if(err) return next (err);
       return res.send();
     });
-
   })
+});
 
-
+app.get('/api/game/:phrase', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+    if(err) return next (err);
+    if(!game) return res.send;
+    game.save((err)=>{
+      if(err) return next (err);
+      return res.send();
+    });
+    console.log(game)
+  })
 });
 
     // delete a review
