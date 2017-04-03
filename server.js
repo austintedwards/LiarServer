@@ -33,14 +33,12 @@ var Game = mongoose.model('Game', {
 
 // Routes
 
-    // Get reviews
     app.get('/api/game', (req, res)=> {
         console.log("fetching games");
     });
 
     // create review and send back all reviews after creation
     app.post('/api/game', (req, res) =>{
-      console.log(req.body)
       Game.create({
           players: [{name:req.body.player}],
           passphrase : req.body.phrase,
@@ -65,7 +63,6 @@ app.put('/api/game/:phrase', (req, res)=> {
     if(err) return next (err);
     if(!game) return res.send;
     if(game.players.length<4){
-      console.log("player", req.body.player)
       game.players.push({name:req.body.player})
     }
     game.save((err)=>{
@@ -77,24 +74,15 @@ app.put('/api/game/:phrase', (req, res)=> {
 
 app.get('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
-    if(err) return next (err);
-    if(!game) return res.send;
-    game.save((err)=>{
-      if(err) return next (err);
-      return res.send();
-    });
-    console.log(game)
+    if(err) {
+      return next (err);
+    }
+    if(!game) return res.json();
+    return res.json(game);
   })
 });
 
-    // delete a review
-    // app.delete('/api/game/:game_id', function(req, res) {
-    //     Review.remove({
-    //         _id : req.params.game_id
-    //     }, function(err, review) {
-    //
-    //     });
-    // });
+
 
 
 // listen (start app with node server.js) ======================================
