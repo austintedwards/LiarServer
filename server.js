@@ -65,6 +65,7 @@ app.put('/api/game/:phrase', (req, res)=> {
     if(err) return next (err);
     if(!game) return res.send;
     if(game.players.length<4){
+      console.log("player", req.body.player)
       game.players.push({name:req.body.player})
     }
     game.save((err)=>{
