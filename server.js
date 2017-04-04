@@ -36,7 +36,7 @@ var Game = mongoose.model('Game', {
 
 // Routes
 
-    router.get('/api/game', (req, res)=> {
+    router.get('/', (req, res)=> {
         console.log("fetching games");
     });
 
