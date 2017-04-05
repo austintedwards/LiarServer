@@ -7,6 +7,11 @@ var morgan = require('morgan');             // log requests to the console (expr
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var cors = require('cors');
+var server = app.listen(process.env.PORT || 5000);
+var http = require('http');
+var io = require('socket.io').listen(server);
+
+
 // Configuration
 if (process.env.MONGO_URL){
   mongoose.connect(process.env.MONGO_URL);
@@ -43,6 +48,7 @@ var Game = mongoose.model('Game', {
     router.get('/', (req, res)=> {
         console.log("fetching games");
     });
+
 
     // create review and send back all reviews after creation
     router.post('/api/game', (req, res) =>{
@@ -91,5 +97,5 @@ router.get('/api/game/:phrase', (req, res)=> {
 
 
 // listen (start app with node server.js) ======================================
-app.listen(process.env.PORT || 5000);
+// app.listen(process.env.PORT || 5000);
 console.log("App listening on port 5000");
