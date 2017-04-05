@@ -17,7 +17,6 @@ if (process.env.MONGO_URL){
   mongoose.connect(process.env.MONGO_URL);
 }else{
   mongoose.connect('mongodb://austke:liars@ds147920.mlab.com:47920/liarsdice');
-
 }
 
 app.use(morgan('dev'));                                         // log every request to the console
@@ -38,9 +37,10 @@ app.use(function(req, res, next) {
 
 // Models
 var Game = mongoose.model('Game', {
-    players: [{name:String}],
+    players: [{name:String, playerNum:Number}],
     passphrase: String,
-    gameplay: []
+    diceRoll: [],
+    totalDice:[]
 });
 
 // Routes
@@ -53,9 +53,10 @@ var Game = mongoose.model('Game', {
     // create review and send back all reviews after creation
     router.post('/api/game', (req, res) =>{
       Game.create({
-          players: [{name:req.body.player}],
+          players: [{name:req.body.player, playerNum:1}],
           passphrase : req.body.phrase,
-          gameplay : [],
+          diceRoll: [],
+          totalDice:[],
           done : false
       }, (err, game)=> {
           if (err)
@@ -75,8 +76,17 @@ router.put('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.send;
-    if(game.players.length<4){
-      game.players.push({name:req.body.player})
+    console.log(req.body)
+    if(req.body.player&&game.players.length<4){
+      game.players.push({name:req.body.player, playerNum:game.players.length})
+    }
+    if (req.body.roll&&game.diceRoll.length<4){
+      game.diceRoll.push(req.body.roll)
+    }
+    if(game.diceRoll.length===game.players.length){
+      var totaldice = game.diceRoll
+      var groupdice = [].concat.apply([],totaldice)
+      game.totalDice.push(groupdice)
     }
     game.save((err)=>{
       if(err) return next (err);
