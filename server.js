@@ -7,9 +7,33 @@ var morgan = require('morgan');             // log requests to the console (expr
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var cors = require('cors');
-var server = app.listen(process.env.PORT || 5000);
-var http = require('http');
-var io = require('socket.io').listen(server);
+var socket = require('socket.io'),
+    http = require('http'),
+    server = http.createServer(),
+    socket = socket.listen(server);
+
+socket.on('connection', function(connection) {
+  console.log('User Connected');
+  connection.on('message', function(data){
+    console.log("data",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('message', data.player);
+  });
+
+  connection.on('start game', function(data){
+    console.log("data",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('start game', data.play);
+  });
+
+  connection.on('send bid', function(data){
+    console.log("data",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('send bid', data.bid);
+  });
+});
+
+
 
 
 // Configuration
@@ -76,9 +100,8 @@ router.put('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.send;
-    console.log(req.body)
     if(req.body.player&&game.players.length<4){
-      game.players.push({name:req.body.player, playerNum:game.players.length})
+      game.players.push({name:req.body.player, playerNum:game.players.length+1})
     }
     if (req.body.roll&&game.diceRoll.length<4){
       game.diceRoll.push(req.body.roll)
@@ -106,6 +129,9 @@ router.get('/api/game/:phrase', (req, res)=> {
 
 
 
+
+server.listen(process.env.PORT || 5001);
+
 // listen (start app with node server.js) ======================================
-// app.listen(process.env.PORT || 5000);
-console.log("App listening on port 5000");
+app.listen(process.env.PORT || 5000);
+console.log("App listening on port 5001");
