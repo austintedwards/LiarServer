@@ -12,24 +12,38 @@ var socket = require('socket.io'),
     server = http.createServer(),
     socket = socket.listen(server);
 
+
 socket.on('connection', function(connection) {
   console.log('User Connected');
   connection.on('message', function(data){
-    console.log("data",data)
+    console.log("player join data",data)
     connection.join(data.page)
     socket.in(data.page).emit('message', data.player);
   });
 
   connection.on('start game', function(data){
-    console.log("data",data)
+    console.log("start game data",data)
     connection.join(data.page)
     socket.in(data.page).emit('start game', data.play);
   });
 
   connection.on('send bid', function(data){
-    console.log("data",data)
+    console.log("bid data",data)
     connection.join(data.page)
-    socket.in(data.page).emit('send bid', data.bid);
+    socket.in(data.page).emit('send bid', data.bid, data.player);
+  });
+
+  connection.on('dice roll', function(data){
+    console.log("dice data",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('dice roll', "dice rolled");
+  });
+
+
+  connection.on('player rolled', function(data){
+    console.log("player rolled",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('player rolled', data.playerNum);
   });
 });
 
@@ -61,7 +75,7 @@ app.use(function(req, res, next) {
 
 // Models
 var Game = mongoose.model('Game', {
-    players: [{name:String, playerNum:Number}],
+    players: [{name:String, playerNum:Number, marks:Number}],
     passphrase: String,
     diceRoll: [],
     totalDice:[]
@@ -77,7 +91,7 @@ var Game = mongoose.model('Game', {
     // create review and send back all reviews after creation
     router.post('/api/game', (req, res) =>{
       Game.create({
-          players: [{name:req.body.player, playerNum:1}],
+          players: [{name:req.body.player, playerNum:1, marks:0}],
           passphrase : req.body.phrase,
           diceRoll: [],
           totalDice:[],
@@ -101,7 +115,7 @@ router.put('/api/game/:phrase', (req, res)=> {
     if(err) return next (err);
     if(!game) return res.send;
     if(req.body.player&&game.players.length<4){
-      game.players.push({name:req.body.player, playerNum:game.players.length+1})
+      game.players.push({name:req.body.player, playerNum:game.players.length+1, marks:0})
     }
     if (req.body.roll&&game.diceRoll.length<4){
       game.diceRoll.push(req.body.roll)
@@ -110,6 +124,7 @@ router.put('/api/game/:phrase', (req, res)=> {
       var totaldice = game.diceRoll
       var groupdice = [].concat.apply([],totaldice)
       game.totalDice.push(groupdice)
+      console.log(game.totalDice);
     }
     game.save((err)=>{
       if(err) return next (err);
@@ -126,12 +141,30 @@ router.get('/api/game/:phrase', (req, res)=> {
   })
 });
 
+router.put('/api/game/:phrase/:playnum', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+    var playnum = req.params.playnum
+    game.players[playnum-1].marks++
+    var marks =game.players[playnum-1].marks
+    console.log("marks", game.players[playnum-1].marks, marks)
+    if (marks===5){
+      game.players.splice(req.params.playnum-1,1)
+    }
+    if(err) return next (err);
+    if(!game) return res.send;
+    game.save((err)=>{
+      if(err) return next (err);
+      return res.send();
+    });
+  })
+})
 
 
 
 
-server.listen(process.env.PORT || 5001);
+server.listen(5001);
 
 // listen (start app with node server.js) ======================================
 app.listen(process.env.PORT || 5000);
-console.log("App listening on port 5001");
+
+console.log("App listening on port 5000");
