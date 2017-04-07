@@ -24,7 +24,7 @@ socket.on('connection', function(connection) {
   connection.on('start game', function(data){
     console.log("start game data",data)
     connection.join(data.page)
-    socket.in(data.page).emit('start game', data.play);
+    socket.in(data.page).emit('start game', data.play, data.playerNum);
   });
 
   connection.on('send bid', function(data){
@@ -36,7 +36,7 @@ socket.on('connection', function(connection) {
   connection.on('dice roll', function(data){
     console.log("dice data",data)
     connection.join(data.page)
-    socket.in(data.page).emit('dice roll', "dice rolled");
+    socket.in(data.page).emit('dice roll', data.totalDice);
   });
 
 
@@ -112,7 +112,6 @@ var Game = mongoose.model('Game', {
       }, (err, game)=> {
           if (err)
               res.send(err);
-
           // get and return all the reviews after you create another
           Game.find((err, game)=> {
               if (err)
@@ -145,7 +144,7 @@ router.put('/api/game/:phrase', (req, res)=> {
     }
     game.save((err)=>{
       if(err) return next (err);
-      return res.send();
+      return res.json(game);
     });
   })
 });
