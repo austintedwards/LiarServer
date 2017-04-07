@@ -45,11 +45,17 @@ socket.on('connection', function(connection) {
     connection.join(data.page)
     socket.in(data.page).emit('player rolled', data.playerNum);
   });
-  
+
   connection.on('you marked', function(data){
     console.log("you marked",data)
     connection.join(data.page)
     socket.in(data.page).emit('you marked', data.playerNum);
+  });
+
+  connection.on('new roll', function(data){
+    console.log("new roll",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('new roll', data.playerNum);
   });
 
 });
@@ -121,6 +127,10 @@ router.put('/api/game/:phrase', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.send;
+    if (game.diceRoll.length!==0&&game.totalDice.length){
+      game.diceRoll =[];
+      game.totalDice=[];
+    }
     if(req.body.player&&game.players.length<4){
       game.players.push({name:req.body.player, playerNum:game.players.length+1, marks:0})
     }
