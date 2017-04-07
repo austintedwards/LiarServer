@@ -45,6 +45,13 @@ socket.on('connection', function(connection) {
     connection.join(data.page)
     socket.in(data.page).emit('player rolled', data.playerNum);
   });
+  
+  connection.on('you marked', function(data){
+    console.log("you marked",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('you marked', data.playerNum);
+  });
+
 });
 
 
@@ -154,12 +161,19 @@ router.put('/api/game/:phrase/:playnum', (req, res)=> {
     if(!game) return res.send;
     game.save((err)=>{
       if(err) return next (err);
-      return res.send();
+      return res.json(game)
     });
   })
 })
 
-
+router.get('/api/game/:phrase/:playnum', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+    if(err) return next (err);
+    if(!game) return res.json({passphrase:"not working"});
+    console.log("game", game.players[req.params.playnum-1])
+    return res.json(game);
+  });
+});
 
 
 server.listen(5001);
