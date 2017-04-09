@@ -58,6 +58,13 @@ socket.on('connection', function(connection) {
     socket.in(data.page).emit('new roll', data.playerNum);
   });
 
+  connection.on('out of game', function(data){
+    console.log("out of game",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('out of game', data.player);
+  });
+
+
 });
 
 
@@ -159,27 +166,27 @@ router.get('/api/game/:phrase', (req, res)=> {
 
 router.put('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
-    var playnum = req.params.playnum
-    game.players[playnum-1].marks++
-    var marks =game.players[playnum-1].marks
-    console.log("marks", game.players[playnum-1].marks, marks)
-    if (marks===5){
-      game.players.splice(req.params.playnum-1,1)
+    var playnum = req.params.playnum;
+    game.players[playnum-1].marks++;
+    var marks =game.players[playnum-1].marks;
+    console.log("marks", game.players[playnum-1].marks, marks);
+    if (marks===6){
+      game.players.splice(req.params.playnum-1,1);
     }
     if(err) return next (err);
     if(!game) return res.send;
     game.save((err)=>{
       if(err) return next (err);
-      return res.json(game)
+      return res.json(game);
     });
-  })
-})
+  });
+});
 
 router.get('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
     if(!game) return res.json({passphrase:"not working"});
-    console.log("game", game.players[req.params.playnum-1])
+    console.log("game", game.players[req.params.playnum-1]);
     return res.json(game);
   });
 });
