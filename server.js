@@ -33,17 +33,16 @@ socket.on('connection', function(connection) {
     socket.in(data.page).emit('send bid', data.bid, data.player);
   });
 
-  connection.on('dice roll', function(data){
-    console.log("dice data",data)
-    connection.join(data.page)
-    socket.in(data.page).emit('dice roll', data.totalDice);
-  });
-
-
   connection.on('player rolled', function(data){
     console.log("player rolled",data)
     connection.join(data.page)
-    socket.in(data.page).emit('player rolled', data.playerNum);
+    socket.in(data.page).emit('player rolled', data.playerNum, data.game);
+  });
+
+  connection.on('players in game', function(data){
+    console.log("players in game",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('player rolled', data.array);
   });
 
   connection.on('you marked', function(data){
@@ -55,7 +54,7 @@ socket.on('connection', function(connection) {
   connection.on('new roll', function(data){
     console.log("new roll",data)
     connection.join(data.page)
-    socket.in(data.page).emit('new roll', data.playerNum);
+    socket.in(data.page).emit('new roll', data.playerNum, data.youUp);
   });
 
   connection.on('out of game', function(data){
@@ -98,7 +97,8 @@ var Game = mongoose.model('Game', {
     players: [{name:String, playerNum:Number, marks:Number}],
     passphrase: String,
     diceRoll: [],
-    totalDice:[]
+    totalDice:[],
+    gamesize:Number
 });
 
 // Routes
@@ -115,6 +115,7 @@ var Game = mongoose.model('Game', {
           passphrase : req.body.phrase,
           diceRoll: [],
           totalDice:[],
+          gamesize:0,
           done : false
       }, (err, game)=> {
           if (err)
@@ -190,6 +191,19 @@ router.delete('/api/game/:phrase/:playnum', (req, res)=> {
     game.save((err)=>{
       if(err) return (err);
       return res.send();
+    });
+  });
+});
+
+router.put('/api/game/:phrase/players/:playersize', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+    var playersize = req.params.playersize;
+      game.gamesize = playersize;
+    if(err) return next (err);
+    if(!game) return res.send;
+    game.save((err)=>{
+      if(err) return next (err);
+      return res.json(game);
     });
   });
 });
