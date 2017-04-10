@@ -162,7 +162,7 @@ router.put('/api/game/:phrase', (req, res)=> {
       console.log(game.totalDice);
     }
     game.save((err)=>{
-      if(err) return next (err);
+      if(err) return  (err);
       return res.json(game);
     });
   })
