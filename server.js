@@ -182,6 +182,18 @@ router.put('/api/game/:phrase/:playnum', (req, res)=> {
   });
 });
 
+router.delete('/api/game/:phrase/:playnum', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+      game.players.splice(req.params.playnum-1,1);
+    if(err) return next (err);
+    if(!game) return res.send;
+    game.save((err)=>{
+      if(err) return (err);
+      return res.send();
+    });
+  });
+});
+
 router.get('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     if(err) return next (err);
