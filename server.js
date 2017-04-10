@@ -10,7 +10,7 @@ var cors = require('cors');
 var socket = require('socket.io'),
     http = require('http'),
     server = http.createServer(),
-    socket = socket.listen(server);
+    socket = socket.listen(app.listen(process.env.PORT || 5000));
 
 
 socket.on('connection', function(connection) {
@@ -196,7 +196,11 @@ router.put('/api/game/:phrase/:playnum', (req, res)=> {
 
 router.delete('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
-      game.players.splice(req.params.playnum-1,1);
+      for (var i =0; i<game.players.length; i++){
+        if (req.params.playnum ===game.players[i].playerNum){
+          game.players.splice(i-1,1);
+        }
+      }
     if(err) return next (err);
     if(!game) return res.send;
     game.save((err)=>{
@@ -229,9 +233,9 @@ router.get('/api/game/:phrase/:playnum', (req, res)=> {
 });
 
 
-server.listen(5001);
+// server.listen(5001);
 
 // listen (start app with node server.js) ======================================
-app.listen(process.env.PORT || 5000);
+// app.listen(process.env.PORT || 5000);
 
 console.log("App listening on port 5000");
