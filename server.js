@@ -63,6 +63,17 @@ socket.on('connection', function(connection) {
     socket.in(data.page).emit('out of game', data.player);
   });
 
+  connection.on('game update', function(data){
+    console.log("game update",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('game update');
+  });
+
+  connection.on('main menu', function(data){
+    console.log("main menu",data)
+    connection.join(data.page)
+    socket.in(data.page).emit('main menu');
+  });
 
 });
 
