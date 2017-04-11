@@ -15,10 +15,11 @@ var socket = require('socket.io'),
 
 socket.on('connection', function(connection) {
   console.log('User Connected');
-  connection.on('message', function(data){
+
+  connection.on('players', function(data){
     console.log("player join data",data)
     connection.join(data.page)
-    socket.in(data.page).emit('message', data.player);
+    socket.in(data.page).emit('players', data.player);
   });
 
   connection.on('start game', function(data){
