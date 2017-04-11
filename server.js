@@ -66,7 +66,7 @@ socket.on('connection', function(connection) {
   connection.on('game update', function(data){
     console.log("game update",data)
     connection.join(data.page)
-    socket.in(data.page).emit('game update');
+    socket.in(data.page).emit('game update', 1);
   });
 
   connection.on('main menu', function(data){
