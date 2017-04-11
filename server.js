@@ -179,11 +179,10 @@ router.get('/api/game/:phrase', (req, res)=> {
 router.put('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     var playnum = req.params.playnum;
-    game.players[playnum-1].marks++;
-    var marks =game.players[playnum-1].marks;
-    console.log("marks", game.players[playnum-1].marks, marks);
-    if (marks===6){
-      game.players.splice(req.params.playnum-1,1);
+    for (var i =0; i<game.players.length; i++){
+      if (req.params.playnum ===game.players[i].playerNum){
+        game.players[i-1].marks++;
+      }
     }
     if(err) return next (err);
     if(!game) return res.send;
