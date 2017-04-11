@@ -180,24 +180,26 @@ router.put('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     var playnum = req.params.playnum;
     for (var i =0; i<game.players.length; i++){
-      if (req.params.playnum ===game.players[i].playerNum){
-        game.players[i-1].marks++;
+      console.log("playerNum",game.players[i].playerNum)
+      if (game.players[i].playerNum === Number(playnum)){
+        console.log(game.players[i])
+        game.players[i].marks++;
       }
     }
     if(err) return next (err);
     if(!game) return res.send;
-    game.save((err)=>{
+      game.save((err)=>{
       if(err) return next (err);
       return res.json(game);
-    });
+      });
   });
 });
 
 router.delete('/api/game/:phrase/:playnum', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
       for (var i =0; i<game.players.length; i++){
-        if (req.params.playnum ===game.players[i].playerNum){
-          game.players.splice(i-1,1);
+        if (Number(req.params.playnum) ===game.players[i].playerNum){
+          game.players.splice(i,1);
         }
       }
     if(err) return next (err);
