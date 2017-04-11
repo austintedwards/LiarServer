@@ -24,7 +24,7 @@ socket.on('connection', function(connection) {
   connection.on('start game', function(data){
     console.log("start game data",data)
     connection.join(data.page)
-    socket.in(data.page).emit('start game', data.play, data.playerNum);
+    socket.in(data.page).emit('start game', data.play, data.playerNum, data.otherPlayers);
   });
 
   connection.on('send bid', function(data){
