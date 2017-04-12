@@ -110,7 +110,8 @@ var Game = mongoose.model('Game', {
     passphrase: String,
     diceRoll: [],
     totalDice:[],
-    gamesize:Number
+    gamesize:Number,
+    playerUp: Number
 });
 
 // Routes
@@ -128,6 +129,7 @@ var Game = mongoose.model('Game', {
           diceRoll: [],
           totalDice:[],
           gamesize:0,
+          playerUp:1,
           done : false
       }, (err, game)=> {
           if (err)
@@ -216,6 +218,19 @@ router.put('/api/game/:phrase/players/:playersize', (req, res)=> {
   Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
     var playersize = req.params.playersize;
       game.gamesize = playersize;
+    if(err) return next (err);
+    if(!game) return res.send;
+    game.save((err)=>{
+      if(err) return next (err);
+      return res.json(game);
+    });
+  });
+});
+
+router.put('/api/game/:phrase/playerUp/:playerUp', (req, res)=> {
+  Game.findOne({passphrase:req.params.phrase}, (err,game)=>{
+    var playerUp = req.params.playerUp;
+      game.playerUp = playerUp;
     if(err) return next (err);
     if(!game) return res.send;
     game.save((err)=>{
